@@ -1,0 +1,97 @@
+package com.Price.quotation.Service;
+
+ 
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.stereotype.Service;
+
+ 
+
+import com.Price.quotation.Model.Product;
+import com.Price.quotation.Model.User;
+
+ 
+
+@Service("userService")
+public class UserServiceImpl implements UserService {
+    @Autowired
+    private static JdbcTemplate jdbcTemplate;
+
+ 
+
+    // --------------------------------------------------------
+    public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+    }
+
+ 
+
+    // --------------------------------------------------------
+    public boolean addUser(User register) {
+        
+        
+        String sql = "insert into user_table(firstName,lastName,dateOfBirth,gender,contact_number,userId,password,address) values(?,?,?,?,?,?,?,?)";
+            
+         try {
+                int counter = jdbcTemplate.update(sql,
+                        new Object[] { register.getFirstName(), register.getLastName(), register.getDateOfBirth(),
+                                register.getGender(), register.getContactNumber(),
+                                register.getUserId(), register.getPassword(),register.getAddress()});
+
+ 
+
+     
+            return true;
+
+ 
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+ 
+
+    // -----------------------------------------------
+    
+    
+    public int update(User u){    
+        String sql="update user_table set firstName='"+u.getFirstName()+"',lastName='"+u.getLastName()+"',dateOfBirth='"+u.getDateOfBirth()+"',gender='"+u.getGender()+"',contact_number='"+u.getContactNumber()+"',userId='"+u.getUserId()+"',password='"+u.getPassword()+"',address='"+u.getAddress(); 
+        return jdbcTemplate.update(sql);    
+    }    
+    
+    public  User getUserById(int Id){    
+        String sql="select * from product_table where Id=?";    
+        return jdbcTemplate.queryForObject(sql, new Object[]{Id},new BeanPropertyRowMapper<User>(User.class));    
+    }    
+    
+    
+    @Override
+    public List<User> read() {
+        List<User> userList = jdbcTemplate.query("select * from user_table", new RowMapper<User>() {
+
+ 
+
+            @Override
+            public User mapRow(ResultSet set, int rowNum) throws SQLException {
+                User user = new User();
+                user.setUserId(set.getString("userId"));
+                user.setPassword(set.getString("password"));
+                return user;
+            }
+        });
+        return userList;
+    }
+    
+    
+}
+
+ 
+
